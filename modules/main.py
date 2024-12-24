@@ -9,7 +9,7 @@ import subprocess
 import logging
 from utils import progress_bar
 import core as helper
-from config import BOT_TOKEN, API_ID, API_HASH, MONGO_URI, BOT_NAME
+from config import BOT_TOKEN, API_ID, API_HASH, BOT_NAME
 import aiohttp
 from aiohttp import ClientSession
 from pyromod import listen
@@ -21,11 +21,7 @@ from pyrogram.errors.exceptions.bad_request_400 import StickerEmojiInvalid
 from pyrogram.types.messages_and_media import message
 from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup, CallbackQuery
 from bs4 import BeautifulSoup
-from logs import get_last_two_minutes_logs
 import tempfile
-from db import get_collection, save_name, load_name, save_log_channel_id, load_log_channel_id, save_authorized_users, load_authorized_users, load_allowed_channel_ids, save_allowed_channel_ids, load_accept_logs, save_accept_logs # Import the database functions
-from db import save_bot_running_time, load_bot_running_time, reset_bot_running_time, save_max_running_time, load_max_running_time
-from db import save_queue_file, load_queue_file
 from PIL import Image
 from pytube import Playlist  #Youtube Playlist Extractor
 from yt_dlp import YoutubeDL
@@ -37,14 +33,50 @@ bot = Client("bot",
              api_id=API_ID,
              api_hash=API_HASH)
 
-# Get the MongoDB collection for this bot
-collection = get_collection(BOT_NAME, MONGO_URI)
+# Define aiohttp routes
+routes = web.RouteTableDef()
+
+@routes.get("/", allow_head=True)
+async def root_route_handler(request):
+    return web.json_response("https://txt-uploader2.onrender.com")
+
+async def web_server():
+    web_app = web.Application(client_max_size=30000000)
+    web_app.add_routes(routes)
+    return web_app
+
+async def start_bot():
+    await bot.start()
+    print("Bot is up and running")
+
+async def stop_bot():
+    await bot.stop()
+
+async def main():
+    if WEBHOOK:
+        # Start the web server
+        app_runner = web.AppRunner(await web_server())
+        await app_runner.setup()
+        site = web.TCPSite(app_runner, "0.0.0.0", PORT)
+        await site.start()
+        print(f"Web server started on port {PORT}")
+
+    # Start the bot
+    await start_bot()
+
+    # Keep the program running
+    try:
+        while True:
+            await asyncio.sleep(3600)  # Run forever, or until interrupted
+    except (KeyboardInterrupt, SystemExit):
+        await stop_bot()
+
 # Constants
-OWNER_IDS = [6508674490]  # Replace with the actual owner user IDs
+OWNER_IDS = [7341059064]  # Replace with the actual owner user IDs
 
 cookies_file_path = "modules/cookies.txt"
 # Global variables
-log_channel_id = -1002383275509
+log_channel_id = -1002471133201
 authorized_users = []
 ALLOWED_CHANNEL_IDS = []
 my_name = "𝐊𝐔𝐍𝐀𝐋❤️"
