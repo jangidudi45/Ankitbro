@@ -142,6 +142,7 @@ async def add_auth_user(client: Client, message: Message):
             authorized_users.append(new_user_id)
             save_authorized_users(collection, authorized_users)
             await message.reply(f"User {new_user_id} added to authorized users."
+                                
         else:
             await message.reply(f"User {new_user_id} is already in the authorized users list.")
     except (IndexError, ValueError):
