@@ -82,12 +82,25 @@ async def start_bot():
 async def stop_bot():
     await bot.stop()
 
+async def main():
+    if WEBHOOK:
+        # Start the web server
+        app_runner = web.AppRunner(await web_server())
+        await app_runner.setup()
+        site = web.TCPSite(app_runner, "0.0.0.0", PORT)
+        await site.start()
+        print(f"Web server started on port {PORT}")
 
-my_name = "𝐀𝐍𝐊𝐈𝐓❤️"
+    # Start the bot
+    await start_bot()
 
- 
-
-#====================== START COMMAND ======================
+    # Keep the program running
+    try:
+        while True:
+            await asyncio.sleep(3600)  # Run forever, or until interrupted
+    except (KeyboardInterrupt, SystemExit):
+        await stop_bot()
+        
 class Data:
     START = (
         "🌟 Welcome {0}! 🌟\n\n"
@@ -126,26 +139,22 @@ async def start(client: Client, msg: Message):
     await asyncio.sleep(1)
     await start_message.edit_text(
         Data.START.format(msg.from_user.mention) +
-        "Checking subscription status... 🔍\n\n"
+        "Checking Bot Status... 🔍\n\n"
         "Progress: [🟨🟨🟨🟨🟨🟨🟨⬜⬜] 75%\n\n"
     )
 
-@bot.on_message(filters.command("stop"))
-async def stop_handler(_, message):
-    global bot_running, start_time
-    if bot_running:
-        bot_running = False
-        start_time = None
-        await message.reply_text("**Stopped**🚦", True)
-        os.execl(sys.executable, sys.executable, *sys.argv)
-    else:
-        await message.reply_text("Bot is not running.", True)
+    await asyncio.sleep(1)
+    await start_message.edit_text(
+        Data.START.format(msg.from_user.mention) +
+        "Checking status Ok... Command Nhi Bataunga **Bot Made BY 𝐀𝐍𝐊𝐈𝐓 𝐒𝐇𝐀𝐊𝐘𝐀™👨🏻‍💻**🔍\n\n"
+        "Progress:[🟩🟩🟩🟩🟩🟩🟩🟩🟩] 100%\n\n"
+    )
 
+@bot.on_message(filters.command(["stop"]) )
+async def restart_handler(_, m):
+    await m.reply_text("**STOPPED**🛑", True)
+    os.execl(sys.executable, sys.executable, *sys.argv)
 
-@bot.on_message(filters.command("check") & filters.create(owner_filter))
-async def owner_command(bot: Client, message: Message):
-    global OWNER_TEXT
-    await message.reply_text(OWNER_TEXT)
 
 @bot.on_message(filters.command(["ankit","upload"]) )
 async def txt_handler(bot: Client, m: Message):
@@ -269,7 +278,7 @@ async def txt_handler(bot: Client, m: Message):
              url =  f"https://madxpw-api-e0913deb3016.herokuapp.com/{vid_id}/master.m3u8?token={raw_text4}"
 
             name1 = links[i][0].replace("\t", "").replace(":", "").replace("/", "").replace("+", "").replace("#", "").replace("|", "").replace("@", "").replace("*", "").replace(".", "").replace("https", "").replace("http", "").strip()
-            name = f'{str(count).zfill(3)}) {name1[:60]},{my_name}'
+            name = f'{str(count).zfill(3)}) {name1[:60]}'
                       
             if "/master.mpd" in url :
                 if "https://sec1.pw.live/" in url:
@@ -307,7 +316,8 @@ async def txt_handler(bot: Client, m: Message):
             else:
                 cmd = f'yt-dlp -f "{ytf}" "{url}" -o "{name}.mp4"'
 
-            else:
+            try:  
+                
                 cc = f'**[📹] Video_ID : {str(count).zfill(3)}**\n\n**𝑽𝒊𝒅𝒆𝒐 𝑵𝒂𝒎𝒆** : {name1}\n**𝑩𝒂𝒕𝒄𝒉 𝑵𝒂𝒎𝒆** : {b_name}\n\n**𝑫𝒐𝒘𝒏𝒍𝒐𝒂𝒅𝒆𝒅 𝑩𝒚 : {CR}**'
                 cc1 = f'**[📁] File_ID : {str(count).zfill(3)}**\n\n**𝑭𝒊𝒍𝒆 𝑵𝒂𝒎𝒆** : {name1}\n**𝑩𝒂𝒕𝒄𝒉 𝑵𝒂𝒎𝒆** : {b_name}\n\n**𝑫𝒐𝒘𝒏𝒍𝒐𝒂𝒅𝒆𝒅 𝑩𝒚 : {CR}**'                             
                 
@@ -387,7 +397,7 @@ async def txt_handler(bot: Client, m: Message):
                     await bot.send_document(chat_id=m.chat.id, document=f'{name}.{ext}', caption=cc1)
                     #if accept_logs == 1:  
                         #file_id = message.document.file_id
-                        #await bot.send_document(chat_id=log_channel_id, document=file_id, caption=cc1)
+                        #await bot.send_document(chat_id=m.chat_id, document=file_id, caption=cc1)
                     count += 1
                     os.remove(f'{name}.{ext}')
                 except FloodWait as e:
@@ -411,8 +421,7 @@ async def txt_handler(bot: Client, m: Message):
                     await m.reply_text(str(e))
                     time.sleep(e.x)
                     continue
-                 
-                          
+                                                 
                 else:
                     Show = f"❊⟱ 𝐃𝐨𝐰𝐧𝐥𝐨𝐚𝐝𝐢𝐧𝐠 ⟱❊ »\n\n📄 Title:- `{name}\n\n⌨ 𝐐𝐮𝐥𝐢𝐭𝐲 » {raw_text2}`\n\n**🔗 𝐔𝐑𝐋 »** `{url}`\n\n**𝐁𝐨𝐭 𝐌𝐚𝐝𝐞 𝐁𝐲 ✦ ᴀɴᴋɪᴛ sʜᴀᴋʏᴀ"
                     prog = await m.reply_text(Show)
