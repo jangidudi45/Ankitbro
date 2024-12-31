@@ -143,11 +143,6 @@ async def add_auth_user(client: Client, message: Message):
             save_authorized_users(collection, authorized_users)
             await message.reply(f"User {new_user_id} added to authorized users."
                                 
-        else:
-            await message.reply(f"User {new_user_id} is already in the authorized users list.")
-    except (IndexError, ValueError):
-        await message.reply("Please provide a valid user ID.")
-
 @bot.on_message(filters.command("remove_auth") & filters.create(owner_filter))
 async def remove_auth_user(client: Client, message: Message):
     global authorized_users
