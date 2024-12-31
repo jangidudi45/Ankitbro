@@ -18,19 +18,3 @@ logging.getLogger("pyrogram").setLevel(logging.WARNING)
 
 # Initialize logger
 logger = logging.getLogger()
-
-def get_last_two_minutes_logs():
-    two_minutes_ago = datetime.now() - timedelta(minutes=2)
-    logs = []
-
-    with open("logs.txt", "r") as file:
-        for line in file:
-            try:
-                log_time_str = line.split(" - ")[0]
-                log_time = datetime.strptime(log_time_str, "%d-%b-%y %H:%M:%S")
-                if log_time >= two_minutes_ago:
-                    logs.append(line)
-            except ValueError:
-                continue
-
-    return logs
