@@ -31,3 +31,4 @@ opencv-python-headless
 uvloop
 gunicorn
 cloudscraper
+jinja2
