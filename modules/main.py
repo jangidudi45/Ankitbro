@@ -108,7 +108,7 @@ def auth_user_filter(_, __, message):
     return bool(message.from_user and message.from_user.id in authorized_users)
 
 auth_or_owner_filter = filters.create(lambda _, __, m: auth_user_filter(_, __, m) or owner_filter(_, __, m))
-auth_owner_channel_filter = filters.create(lambdcollectio auth_user_filter(_, __, m) or owner_filter(_, __, m) or channel_filter(_, __, m))
+auth_owner_channel_filter = filters.create(lambda _, __m: auth_user_filter(_, __, m) or owner_filter(_, __, m) or channel_filter(_, __, m))
 owner_or_channel_filter = filters.create(lambda _, __, m: owner_filter(_, __, m) or channel_filter(_, __, m))
 
 
