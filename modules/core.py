@@ -105,7 +105,65 @@ def vid_info(info):
                 pass
     return new_info
 
+# Function to generate DRM keys
+def generate_drm_keys(video_url):
+    wvd = wvd_check()
 
+    headers = {
+        'x-access-token': 'eyJhbGciOiJIUzM4NCIsInR5cCI6IkpXVCJ9.eyJpZCI6MTI0MjA3NTkyLCJvcmdJZCI6NzExNTI4LCJvcmdDb2RlIjoidWphbGFmIiwib3JnTmFtZSI6IlNhcnJ0aGlJQVMiLCJuYW1lIjoiZ2hyaXRhY2hpIHRpd2FyaSIsImVtYWlsIjpudWxsLCJtb2JpbGUiOiI5MTc5ODc1Mzc1NDUiLCJ0eXBlIjoxLCJpc0RpeSI6dHJ1ZSwiaXNJbnRlcm5hdGlvbmFsIjowLCJkZWZhdWx0TGFuZ3VhZ2UiOiJFTiIsImNvdW50cnlDb2RlIjoiSU4iLCJ0aW1lem9uZSI6IkdNVCs1OjMwIiwiY291bnRyeUlTTyI6IjkxIiwiaXNEaXlTdWJhZG1pbiI6MCwiZmluZ2VycHJpbnRJZCI6ImU1NjExOGYyZDE3NThlYjZiNDAwNmUzZjMxZWVlNzVhIiwiaWF0IjoxNzMzNjU3MTgyLCJleHAiOjE3MzQyNjE5ODJ9._SSGS0dYJDwLjGmOQvEiPeTv8SJypWV0oJ_NgPPWGIcv_T9YmmdNH9-fZJLFMwhZ'
+    }
+
+    response = requests.get(f'https://api.classplusapp.com/cams/uploader/video/jw-signed-url?url={video_url}', headers=headers).json()
+
+    if response['status'] != 'ok':
+        return {"error": "Failed to fetch DRM URLs"}
+
+    mpd = response['drmUrls']['manifestUrl']
+    lic = response['drmUrls']['licenseUrl']
+    mpd_response = requests.get(mpd)
+    soup = BeautifulSoup(mpd_response.text, 'xml')
+
+    uuid = soup.find('ContentProtection', attrs={'schemeIdUri': 'urn:uuid:edef8ba9-79d6-4ace-a3c8-27dcd51d21ed'})
+    pssh = uuid.find('cenc:pssh').text
+
+    ipssh = PSSH(pssh)
+    device = Device.load(wvd)
+    cdm = Cdm.from_device(device)
+    session_id = cdm.open()
+    challenge = cdm.get_license_challenge(session_id, ipssh)
+    licence = requests.post(lic, data=challenge, headers=headers)
+    licence.raise_for_status()
+
+    cdm.parse_license(session_id, licence.content)
+
+    keys = []
+    for key in cdm.get_keys(session_id):
+        if key.type != 'SIGNING':
+            keys.append(f'{key.kid.hex}:{key.key.hex()}')
+
+    cdm.close(session_id)
+
+    return {"mpd_url": mpd, "keys": keys}
+
+            elif '/master.mpd' in url:
+             vid_id =  url.split("/")[-2]
+             url =  f"https://madxpw-api-e0913deb3016.herokuapp.com/{vid_id}/master.m3u8?token={raw_text4}"
+
+            name1 = links[i][0].replace("\t", "").replace(":", "").replace("/", "").replace("+", "").replace("#", "").replace("|", "").replace("@", "").replace("*", "").replace(".", "").replace("https", "").replace("http", "").strip()
+            name = f'{str(count).zfill(3)}) {name1[:60]}'
+                      
+            if "/master.mpd" in url :
+                if "https://sec1.pw.live/" in url:
+                    url = url.replace("https://sec1.pw.live/","https://d1d34p8vz63oiq.cloudfront.net/")
+                    print(url)
+                else: 
+                    url = url    
+
+                print("mpd check")
+                key = await helper.get_drm_keys(url)
+                print(key)
+                await m.reply_text(f"got keys form api : \n`{key}`")
+          
 
 async def run(cmd):
     proc = await asyncio.create_subprocess_shell(
