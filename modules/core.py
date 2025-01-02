@@ -105,6 +105,7 @@ def vid_info(info):
                 pass
     return new_info
 
+
 # Function to generate DRM keys
 def generate_drm_keys(video_url):
     wvd = wvd_check()
@@ -143,27 +144,7 @@ def generate_drm_keys(video_url):
 
     cdm.close(session_id)
 
-    return {"mpd_url": mpd, "keys": keys}
-
-            elif '/master.mpd' in url:
-             vid_id =  url.split("/")[-2]
-             url =  f"https://madxpw-api-e0913deb3016.herokuapp.com/{vid_id}/master.m3u8?token={raw_text4}"
-
-            name1 = links[i][0].replace("\t", "").replace(":", "").replace("/", "").replace("+", "").replace("#", "").replace("|", "").replace("@", "").replace("*", "").replace(".", "").replace("https", "").replace("http", "").strip()
-            name = f'{str(count).zfill(3)}) {name1[:60]}'
-                      
-            if "/master.mpd" in url :
-                if "https://sec1.pw.live/" in url:
-                    url = url.replace("https://sec1.pw.live/","https://d1d34p8vz63oiq.cloudfront.net/")
-                    print(url)
-                else: 
-                    url = url    
-
-                print("mpd check")
-                key = await helper.get_drm_keys(url)
-                print(key)
-                await m.reply_text(f"got keys form api : \n`{key}`")
-          
+    return {"mpd_url": mpd, "keys": keys          
 
 async def run(cmd):
     proc = await asyncio.create_subprocess_shell(
