@@ -37,4 +37,4 @@ PyJWT
 sqlalchemy
 pyopenssl
 bs4
-BeautifulSoup
+beautifulsoup
