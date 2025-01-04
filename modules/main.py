@@ -279,7 +279,10 @@ async def txt_handler(bot: Client, m: Message):
 
             name1 = links[i][0].replace("\t", "").replace(":", "").replace("/", "").replace("+", "").replace("#", "").replace("|", "").replace("@", "").replace("*", "").replace(".", "").replace("https", "").replace("http", "").strip()
             name = f'{str(count).zfill(3)}) {name1[:60]}'
-                      
+            
+            if 'cpvod.testbook.com' in url:
+               url = requests.get(f'https://mon-key-3612a8154345.herokuapp.com/get_keys?url=https://cpvod.testbook.com/65f02cbd734b790a42d7317f/playlist.m3u8={url}', headers={'x-access-token': 'eyJjb3Vyc2VJZCI6IjQ1NjY4NyIsInR1dG9ySWQiOm51bGwsIm9yZ0lkIjo0ODA2MTksImNhdGVnb3J5SWQiOm51bGx9r'}).json()['url']
+                   
             if "/master.mpd" in url :
                 if "https://sec1.pw.live/" in url:
                     url = url.replace("https://sec1.pw.live/","https://d1d34p8vz63oiq.cloudfront.net/")
